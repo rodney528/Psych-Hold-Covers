@@ -1,0 +1,30 @@
+[
+	{
+		"save": "playStrumPressAnim",
+		"name": "Play Press on Sustain End",
+		"type": "bool",
+		"description": "Makes press animation play after sustain end.\n(DOESN'T WORK RIGHT NOW)",
+		"value": false
+	},
+	{
+		"save": "sicksOnly",
+		"name": "Play Only on Sicks",
+		"type": "bool",
+		"description": "Only spawns the splash on sick note hits.",
+		"value": false
+	},
+	{
+		"save": "loopHoldAnim",
+		"name": "Loop Hold Cover on Hit",
+		"type": "bool",
+		"description": "Replays the hold cover's loop anim when a sustain piece is hit.",
+		"value": true
+	},
+	{
+		"save": "opponentOnlyHasHoldAnim",
+		"name": "Opponent Only Has Hold Anim",
+		"type": "bool",
+		"description": "Prevent's the opponent from leaving the hold animation.",
+		"value": true
+	}
+]
