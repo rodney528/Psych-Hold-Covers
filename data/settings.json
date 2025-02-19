@@ -1,9 +1,9 @@
 [
 	{
-		"save": "playStrumPressAnim",
-		"name": "Play Press on Sustain End",
+		"save": "noSplashWhenCoverSpawn",
+		"name": "No Splash on Sustain Note",
 		"type": "bool",
-		"description": "Makes press animation play after sustain end.\n(DOESN'T WORK RIGHT NOW)",
+		"description": "If checked, when a cover is supposed to spawn, don't spawn the splash.\nFPS Plus does so I added it for people who would want that.",
 		"value": false
 	},
 	{
@@ -25,6 +25,13 @@
 		"name": "Opponent Only Has Hold Anim",
 		"type": "bool",
 		"description": "Prevent's the opponent from leaving the hold animation.",
+		"value": true
+	},
+	{
+		"save": "botplayHasEndSplash",
+		"name": "Botplay Ignore's Previous Setting",
+		"type": "bool",
+		"description": "Even if the previous setting is on, botplay will still play the ending animation.",
 		"value": true
 	}
 ]

@@ -1,4 +1,5 @@
 import haxe.ds.StringMap;
+import backend.Rating;
 import flixel.group.FlxTypedGroup;
 import objects.NoteSplash;
 import objects.PixelSplashShaderRef;
@@ -14,15 +15,17 @@ typedef TimerSetup = {
 var holdCovers:FlxTypedGroup<ModchartSprite>;
 var coverTimers:Array<FlxTimer> = [];
 
+var noSplashWhenSpawn:Bool = getModSetting('noSplashWhenCoverSpawn', 'Psych-Hold-Covers');
 var loopHolds:Bool = getModSetting('loopHoldAnim', 'Psych-Hold-Covers');
 var sicksOnly:Bool = getModSetting('sicksOnly', 'Psych-Hold-Covers');
 var oppoHasHoldsOnly = function(?isPlayer:Bool = false):Bool {
-	return getModSetting('opponentOnlyHasHoldAnim', 'Psych-Hold-Covers') && (!isPlayer || game.cpuControlled);
+	if (isPlayer == null) isPlayer = false;
+	return getModSetting('opponentOnlyHasHoldAnim', 'Psych-Hold-Covers') && (!isPlayer || (getModSetting('botplayHasEndSplash', 'Psych-Hold-Covers') ? false : game.cpuControlled));
 }
 
 function setupTimer(cover:ModchartSprite, ?customDur:Float):TimerSetup {
 	var timer:FlxTimer;
-	coverTimers.push(timer = new FlxTimer().start(customDur == null ? (Conductor.stepCrochet / 1000) : customDur, (lol:FlxTimer) -> {
+	coverTimers.push(timer = new FlxTimer().start(customDur == null ? (Conductor.stepCrochet / 1000) : customDur, (_:FlxTimer) -> {
 		coverTimers.remove(timer);
 		if (cover.animation.name != 'end')
 			coverAnim(cover, 'end', true);
@@ -65,6 +68,20 @@ function onCreatePost() {
 	setupTimer(holdCovers.members[0]).cover.alpha = 0.0001;
 	game.noteGroup.insert(game.noteGroup.members.indexOf(game.grpNoteSplashes), holdCovers);
 }
+
+var sharedNoteHitPre:Note->Void = (note:Note) -> {
+	final parent:Note = note.parent == null ? note : note.parent;
+	var rating:Rating = Conductor.judgeNote(ratingsData, Math.abs(parent.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset) / playbackRate);
+	if (sicksOnly ? rating.name == 'sick' : true || !note.mustPress) {
+		if (!note.isSustainNote)
+			if (note.sustainLength > 0)
+				if (noSplashWhenSpawn)
+					note.noteSplashData.disabled = true;
+	}
+}
+function opponentNoteHitPre(note:Note) sharedNoteHitPre(note);
+function goodNoteHitPre(note:Note) sharedNoteHitPre(note);
+function otherStrumHitPre(note:Note, strumLane) sharedNoteHitPre(note);
 
 var sharedNoteHit:Note->Void = (note:Note) -> {
 	final parent:Note = note.parent == null ? note : note.parent;
