@@ -14,10 +14,10 @@ typedef TimerSetup = {
 var holdCovers:FlxTypedGroup<ModchartSprite>;
 var coverTimers:Array<FlxTimer> = [];
 
-var loopHolds:Bool = getModSetting('loopHoldAnim', 'HoldCovers');
-var sicksOnly:Bool = getModSetting('sicksOnly', 'HoldCovers');
+var loopHolds:Bool = getModSetting('loopHoldAnim', 'Psych-Hold-Covers');
+var sicksOnly:Bool = getModSetting('sicksOnly', 'Psych-Hold-Covers');
 var oppoHasHoldsOnly = function(?isPlayer:Bool = false):Bool {
-	return getModSetting('opponentOnlyHasHoldAnim', 'HoldCovers') && (!isPlayer || game.cpuControlled);
+	return getModSetting('opponentOnlyHasHoldAnim', 'Psych-Hold-Covers') && (!isPlayer || game.cpuControlled);
 }
 
 function setupTimer(cover:ModchartSprite, ?customDur:Float):TimerSetup {
