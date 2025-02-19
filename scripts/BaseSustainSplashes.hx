@@ -15,12 +15,12 @@ typedef TimerSetup = {
 var holdCovers:FlxTypedGroup<ModchartSprite>;
 var coverTimers:Array<FlxTimer> = [];
 
-var noSplashWhenSpawn:Bool = getModSetting('noSplashWhenCoverSpawn', 'Psych-Hold-Covers');
-var loopHolds:Bool = getModSetting('loopHoldAnim', 'Psych-Hold-Covers');
-var sicksOnly:Bool = getModSetting('sicksOnly', 'Psych-Hold-Covers');
+var noSplashWhenSpawn:Bool = getModSetting('noSplashWhenCoverSpawn');
+var loopHolds:Bool = getModSetting('loopHoldAnim');
+var sicksOnly:Bool = getModSetting('sicksOnly');
 var oppoHasHoldsOnly = function(?isPlayer:Bool = false):Bool {
 	if (isPlayer == null) isPlayer = false;
-	return getModSetting('opponentOnlyHasHoldAnim', 'Psych-Hold-Covers') && (!isPlayer || (getModSetting('botplayHasEndSplash', 'Psych-Hold-Covers') ? false : game.cpuControlled));
+	return getModSetting('opponentOnlyHasHoldAnim') && (!isPlayer || (getModSetting('botplayHasEndSplash') ? false : game.cpuControlled));
 }
 
 function setupTimer(cover:ModchartSprite, ?customDur:Float):TimerSetup {
