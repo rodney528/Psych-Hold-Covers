@@ -7,11 +7,6 @@ import objects.StrumNote;
 import psychlua.ModchartSprite;
 import shaders.RGBPalette;
 
-typedef TimerSetup = {
-	var cover:ModchartSprite;
-	var timer:FlxTimer;
-}
-
 var holdCovers:FlxTypedGroup<ModchartSprite>;
 var coverTimers:Array<FlxTimer> = [];
 
@@ -23,7 +18,7 @@ var oppoHasHoldsOnly = function(?isPlayer:Bool = false):Bool {
 	return getModSetting('opponentOnlyHasHoldAnim') && (!isPlayer || (getModSetting('botplayHasEndSplash') ? false : game.cpuControlled));
 }
 
-function setupTimer(cover:ModchartSprite, ?customDur:Float):TimerSetup {
+function setupTimer(cover:ModchartSprite, ?customDur:Float):{cover:ModchartSprite, timer:FlxTimer} {
 	var timer:FlxTimer;
 	coverTimers.push(timer = new FlxTimer().start(customDur == null ? (Conductor.stepCrochet / 1000) : customDur, (_:FlxTimer) -> {
 		coverTimers.remove(timer);
