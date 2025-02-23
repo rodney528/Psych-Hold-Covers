@@ -25,7 +25,7 @@ function setupTimer(cover:ModchartSprite, ?customDur:Float):{cover:ModchartSprit
 		if (cover.animation.name != 'end')
 			coverAnim(cover, 'end', true);
 	}));
-	return {cover: cover, timer: timer};
+	return {cover: cover, timer: timer}
 }
 
 var animCheck:StringMap<ModchartSprite->Bool> = [
@@ -53,7 +53,7 @@ function setupCover(lol:ModchartSprite, noteData:Int):ModchartSprite {
 			case 'start': coverAnim(cover, 'hold');
 			case 'end': cover.kill();
 		}
-	};
+	}
 	return cover;
 }
 
