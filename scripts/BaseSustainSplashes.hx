@@ -62,6 +62,7 @@ function onCreatePost() {
 	holdCovers.add(setupCover(null, null));
 	setupTimer(holdCovers.members[0]).cover.alpha = 0.0001;
 	game.noteGroup.insert(game.noteGroup.members.indexOf(game.grpNoteSplashes), holdCovers);
+	return;
 }
 
 var sharedNoteHitPre:Note->Void = (note:Note) -> {
@@ -74,9 +75,9 @@ var sharedNoteHitPre:Note->Void = (note:Note) -> {
 					note.noteSplashData.disabled = true;
 	}
 }
-function opponentNoteHitPre(note:Note) sharedNoteHitPre(note);
-function goodNoteHitPre(note:Note) sharedNoteHitPre(note);
-function otherStrumHitPre(note:Note, strumLane) sharedNoteHitPre(note);
+function opponentNoteHitPre(note:Note) {sharedNoteHitPre(note); return;}
+function goodNoteHitPre(note:Note) {sharedNoteHitPre(note); return;}
+function otherStrumHitPre(note:Note, strumLane) {sharedNoteHitPre(note); return;}
 
 var sharedNoteHit:Note->Void = (note:Note) -> {
 	final parent:Note = note.parent == null ? note : note.parent;
@@ -119,14 +120,15 @@ var sharedNoteHit:Note->Void = (note:Note) -> {
 		}
 	}
 }
-function opponentNoteHit(note:Note) sharedNoteHit(note);
-function goodNoteHit(note:Note) sharedNoteHit(note);
-function otherStrumHit(note:Note, strumLane) sharedNoteHit(note);
+function opponentNoteHit(note:Note) {sharedNoteHit(note); return;}
+function goodNoteHit(note:Note) {sharedNoteHit(note); return;}
+function otherStrumHit(note:Note, strumLane) {sharedNoteHit(note); return;}
 
 function noteMiss(note:Note) {
 	var parent:Note = note.parent == null ? note : note.parent;
 	if (parent.extraData.exists('holdCover') && parent.extraData.get('holdCover') != null)
 		parent.extraData.get('holdCover').kill();
+	return;
 }
 
 function setCoverPos(cover:ModchartSprite, data:Int, strumGroup:FlxTypedGroup<StrumNote>) {
@@ -149,4 +151,5 @@ function onUpdatePost(elapsed:Float) {
 			cover.cameras = strum._cameras;
 		}
 	}
+	return;
 }
