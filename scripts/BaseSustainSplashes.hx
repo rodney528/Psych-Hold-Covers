@@ -20,7 +20,7 @@ var loopHolds:Bool = getModSetting('loopHoldAnim');
 var sicksOnly:Bool = getModSetting('sicksOnly');
 var oppoHasHoldsOnly = function(?isPlayer:Bool = false):Bool {
 	if (isPlayer == null) isPlayer = false;
-	return getModSetting('opponentOnlyHasHoldAnim') && (!isPlayer || (getModSetting('botplayHasEndSplash') ? false : game.cpuControlled));
+	return getModSetting('opponentOnlyHasHoldAnim') && (!isPlayer || (getModSetting('botplayHasEndSplash') ? false : cpuControlled));
 }
 
 function setupTimer(cover:ModchartSprite, ?customDur:Float):TimerSetup {
@@ -59,20 +59,23 @@ function setupCover(lol:ModchartSprite, noteData:Int):ModchartSprite {
 			case 'end': cover.kill();
 		}
 	}
+	cover.alpha = 1;
+	cover.visible = true;
+	if (lol == null)
+		holdCovers.add(cover);
 	return cover;
 }
 
 function onCreatePost() {
 	holdCovers = new FlxTypedGroup();
-	holdCovers.add(setupCover(null, null));
-	setupTimer(holdCovers.members[0]).cover.alpha = 0.0001;
-	game.noteGroup.insert(game.noteGroup.members.indexOf(game.grpNoteSplashes), holdCovers);
+	setupTimer(setupCover(null, null)).cover.alpha = 0.0001;
+	noteGroup.insert(noteGroup.members.indexOf(grpNoteSplashes), holdCovers);
 }
 
 var sharedNoteHitPre:Note->Void = (note:Note) -> {
 	final parent:Note = note.parent == null ? note : note.parent;
 	var rating:Rating = Conductor.judgeNote(ratingsData, Math.abs(parent.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset) / playbackRate);
-	if (sicksOnly ? rating.name == 'sick' : true || !note.mustPress) {
+	if (sicksOnly ? !(rating.ratingMod < 1) : true || !note.mustPress) {
 		if (!note.isSustainNote)
 			if (note.sustainLength > 0)
 				if (noSplashWhenSpawn)
@@ -85,13 +88,12 @@ function otherStrumHitPre(note:Note, strumLane) sharedNoteHitPre(note);
 
 var sharedNoteHit:Note->Void = (note:Note) -> {
 	final parent:Note = note.parent == null ? note : note.parent;
-	if (sicksOnly ? parent.rating == 'sick' : true || !note.mustPress) {
+	if (sicksOnly ? !(rating.ratingMod < 1) : true || !note.mustPress) {
 		if (!note.isSustainNote) {
 			if (note.sustainLength > 0) {
 				var cover:ModchartSprite;
 				final colorSplash:Bool = note.noteSplashData.useRGBShader || !PlayState.SONG.disableNoteRGB;
 				note.extraData.set('holdCover', setupTimer(setupCover(cover = holdCovers.recycle(ModchartSprite), colorSplash ? null : note.noteData), note.sustainLength / 1000).cover);
-				holdCovers.add(cover);
 				if (colorSplash) {
 					var tempShader:RGBPalette = null;
 					final rgbShader:PixelSplashShaderRef = new PixelSplashShaderRef();
@@ -107,11 +109,11 @@ var sharedNoteHit:Note->Void = (note:Note) -> {
 					if (PlayState.isPixelStage || !ClientPrefs.data.antialiasing) cover.antialiasing = false;
 				}
 				cover.alpha = ClientPrefs.data.splashAlpha;
-				var strumGroup:FlxTypedGroup<StrumNote> = note.extraData.exists('setStrumLane') ? note.extraData.get('setStrumLane').lane : (note.mustPress ? game.playerStrums : game.opponentStrums);
+				var strumGroup:FlxTypedGroup<StrumNote> = note.extraData.exists('setStrumLane') ? note.extraData.get('setStrumLane').lane : (note.mustPress ? playerStrums : opponentStrums);
 				var strum:StrumNote = strumGroup.members[note.noteData];
 				if (note != null) cover.alpha = note.noteSplashData.a * strum.alpha;
 				coverAnim(cover, oppoHasHoldsOnly(note.mustPress) ? 'hold' : 'start', oppoHasHoldsOnly(note.mustPress)); // jic
-				setCoverPos(cover, note.noteData, note.extraData.exists('setStrumLane') ? note.extraData.get('setStrumLane').lane : (note.mustPress ? game.playerStrums : game.opponentStrums)); // jic
+				setCoverPos(cover, note.noteData, note.extraData.exists('setStrumLane') ? note.extraData.get('setStrumLane').lane : (note.mustPress ? playerStrums : opponentStrums)); // jic
 			}
 		} else {
 			if (parent.extraData.exists('holdCover') && parent.extraData.get('holdCover') != null) {
@@ -147,7 +149,7 @@ function onUpdatePost(elapsed:Float) {
 		var parent:Note = note.parent == null ? note : note.parent;
 		if (parent.extraData.exists('holdCover') && parent.extraData.get('holdCover') != null) {
 			var cover:ModchartSprite = parent.extraData.get('holdCover');
-			var strumGroup:FlxTypedGroup<StrumNote> = note.extraData.exists('setStrumLane') ? note.extraData.get('setStrumLane').lane : (note.mustPress ? game.playerStrums : game.opponentStrums);
+			var strumGroup:FlxTypedGroup<StrumNote> = note.extraData.exists('setStrumLane') ? note.extraData.get('setStrumLane').lane : (note.mustPress ? playerStrums : opponentStrums);
 			var strum:StrumNote = strumGroup.members[note.noteData];
 			if (oppoHasHoldsOnly(note.mustPress) && cover.animation.name == 'end') cover.kill();
 			if (cover.animation.name != 'end') setCoverPos(cover, note.noteData, strumGroup);
