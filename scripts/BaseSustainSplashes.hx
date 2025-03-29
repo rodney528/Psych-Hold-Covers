@@ -54,21 +54,24 @@ function setupCover(lol:ModchartSprite, noteData:Int):ModchartSprite {
 			case 'end': cover.kill();
 		}
 	}
+	cover.alpha = 1;
+	cover.visible = true;
+	if (lol == null)
+		holdCovers.add(cover);
 	return cover;
 }
 
 function onCreatePost() {
 	holdCovers = new FlxTypedGroup();
-	holdCovers.add(setupCover(null, null));
-	setupTimer(holdCovers.members[0]).cover.alpha = 0.0001;
-	game.noteGroup.insert(game.noteGroup.members.indexOf(game.grpNoteSplashes), holdCovers);
+	setupTimer(setupCover(null, null)).cover.alpha = 0.0001;
+	noteGroup.insert(noteGroup.members.indexOf(grpNoteSplashes), holdCovers);
 	return;
 }
 
 var sharedNoteHitPre:Note->Void = (note:Note) -> {
 	final parent:Note = note.parent == null ? note : note.parent;
 	var rating:Rating = Conductor.judgeNote(ratingsData, Math.abs(parent.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset) / playbackRate);
-	if (sicksOnly ? rating.name == 'sick' : true || !note.mustPress) {
+	if (sicksOnly ? !(rating.ratingMod < 1) : true || !note.mustPress) {
 		if (!note.isSustainNote)
 			if (note.sustainLength > 0)
 				if (noSplashWhenSpawn)
@@ -81,13 +84,12 @@ function otherStrumHitPre(note:Note, strumLane) {sharedNoteHitPre(note); return;
 
 var sharedNoteHit:Note->Void = (note:Note) -> {
 	final parent:Note = note.parent == null ? note : note.parent;
-	if (sicksOnly ? parent.rating == 'sick' : true || !note.mustPress) {
+	if (sicksOnly ? !(rating.ratingMod < 1) : true || !note.mustPress) {
 		if (!note.isSustainNote) {
 			if (note.sustainLength > 0) {
 				var cover:ModchartSprite;
 				final colorSplash:Bool = note.noteSplashData.useRGBShader || !PlayState.SONG.disableNoteRGB;
 				note.extraData.set('holdCover', setupTimer(setupCover(cover = holdCovers.recycle(ModchartSprite), colorSplash ? null : note.noteData), note.sustainLength / 1000).cover);
-				holdCovers.add(cover);
 				if (colorSplash) {
 					var tempShader:RGBPalette = null;
 					final rgbShader:PixelSplashShaderRef = new PixelSplashShaderRef();
